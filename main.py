@@ -1,12 +1,34 @@
-import cv2 as cv
-import numpy as np
-import matplotlib.pyplot as plt
+import cv2
+import glob
 import os
 
-def SURF():
-    root = os.getcwd()
-    imgPath = os.path(root, 'demoImages/tesla.jpg')
-    imgGray = cv.imread(imgPath, cv.IMREAD_GRAYSCALE)
+detection = Detection()
 
-    hessianThreshold = 3000
-    surf = cv.
+# Get all directories within 'datasets/train'
+folder_paths = os.listdir("/kaggle/input/100-bird-species/train")
+
+images = []
+labels = []
+
+# Iterate through each directory
+for folder_path in folder_paths:
+    # Build full path
+    folder_path = folder_path.replace(' ', '_')
+    category_path = os.path.join("/kaggle/input/100-bird-species/train", folder_path)
+    
+    # Check if it's a directory
+    if os.path.isdir(category_path):
+        # Collect images and labels
+        category_images = glob.glob(os.path.join(category_path, "*.jpg"))
+        images.extend(category_images)
+        labels.extend([folder_path] * len(category_images))
+
+train(images, labels)  
+
+detection.load_model('model.pkl')
+test_image = cv2.imread("test.jpg")
+test_image = cv2.cvtColor(test_image, cv2.COLOR_BGR2GRAY)
+predicted_category = detection.classify(test_image)
+
+# Print the predicted category
+print(f"Predicted category for 'test.jpg': {detection.labels[predicted_category]}")

@@ -1,1 +1,4 @@
 my-venv
+__pycache__
+.idea
+datasets
