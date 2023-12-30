@@ -1,11 +1,14 @@
 import cv2
 import glob
 import os
+from detection import Detection
+from training import train
+
 
 detection = Detection()
 
 # Get all directories within 'datasets/train'
-folder_paths = os.listdir("/kaggle/input/100-bird-species/train")
+folder_paths = os.listdir("datasets/train")
 
 images = []
 labels = []
@@ -14,7 +17,7 @@ labels = []
 for folder_path in folder_paths:
     # Build full path
     folder_path = folder_path.replace(' ', '_')
-    category_path = os.path.join("/kaggle/input/100-bird-species/train", folder_path)
+    category_path = os.path.join("datasets/train", folder_path)
     
     # Check if it's a directory
     if os.path.isdir(category_path):

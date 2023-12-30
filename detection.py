@@ -1,4 +1,6 @@
 import cv2
+from cv2 import SIFT
+from training import normalize_features
 import pickle
 
 class Detection:
@@ -33,8 +35,10 @@ class Detection:
         """
 
         # Feature extraction with SURF
-        surf = cv2.xfeatures2d.SURF.create()
-        kp, des = surf.detectAndCompute(image, None)
+        img = cv2.imread(image)
+        gray= cv2.cvtColor(img, cv2.COLOR_BGR2GRAY)
+        sift = SIFT.create()
+        kp, des = sift.detectAndCompute(gray, None)
         features = des
 
         # Normalize features

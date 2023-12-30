@@ -1,7 +1,8 @@
 import cv2
-from cv2 import xfeatures2d
+from cv2 import SIFT
 import numpy as np
 import pickle
+from sklearn.preprocessing import LabelEncoder
 
 def train(images, labels, save_path="model.pkl"):
     """
@@ -15,25 +16,31 @@ def train(images, labels, save_path="model.pkl"):
     Returns:
         None
     """
-    print(images, labels)
+
     # Feature extraction with SURF
     features = []
     for image in images:
-        surf = xfeatures2d.SURF.create()
-        kp, des = surf.detectAndCompute(image, None)
+        img = cv2.imread(image)
+        gray= cv2.cvtColor(img, cv2.COLOR_BGR2GRAY)
+        sift = SIFT.create()
+        kp, des = sift.detectAndCompute(gray, None)
         features.append(des)
 
     # Feature normalization
     features = normalize_features(features)
 
+    # Convert string labels to integers
+    le = LabelEncoder()
+    labels = le.fit_transform(labels)
+
     # Train K-Nearest Neighbors model
     model = cv2.ml.KNearest.create()
-    model.train(np.asarray(features), np.asarray(labels), cv2.ml.ROW_SAMPLE)
+    model.train(np.array(features, dtype=np.float32), cv2.ml.ROW_SAMPLE, np.array(labels, dtype=np.float32))
 
     # Save model and labels
     with open(save_path, 'wb') as f:
         pickle.dump(model, f)
-        pickle.dump(labels, f)
+        pickle.dump(le, f)
 
 def normalize_features(features):
     """
